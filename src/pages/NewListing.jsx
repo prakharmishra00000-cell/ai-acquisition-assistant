@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Wand2, Globe, DollarSign, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const NewListing = () => {
+const NewListing = ({ setGlobalData }) => {
   const [step, setStep] = useState(1);
   const [url, setUrl] = useState('');
   const [price, setPrice] = useState('');
-  const [intelligenceData, setIntelligenceData] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
   const handleAnalyze = async () => {
@@ -28,21 +28,21 @@ const NewListing = () => {
       
       const data = await response.json();
       if (data.success) {
-        setIntelligenceData(data.data);
+        setGlobalData(data.data);
         setStep(3);
       } else {
-        alert('Failed to analyze website. ' + data.error);
+        setErrorMsg(data.error || 'Failed to analyze website.');
         setStep(1);
       }
     } catch (error) {
       console.error('API Error:', error);
-      alert('Error connecting to backend API.');
+      setErrorMsg('Error connecting to backend API.');
       setStep(1);
     }
   };
 
   const handleFinish = () => {
-    navigate('/intelligence', { state: { intelligenceData } });
+    navigate('/intelligence');
   };
 
   return (
@@ -64,6 +64,12 @@ const NewListing = () => {
             <h1 className="text-gradient" style={{ fontSize: '2.5rem' }}>Sell Your Project</h1>
             <p className="text-secondary mb-4">Enter your details and let our AI agents handle the rest.</p>
             
+            {errorMsg && (
+              <div className="p-4 mb-4" style={{ background: 'rgba(255, 50, 50, 0.1)', border: '1px solid rgba(255, 50, 50, 0.3)', borderRadius: '8px', color: '#ff6b6b' }}>
+                <strong>AI Analysis Failed:</strong> {errorMsg}
+              </div>
+            )}
+
             <div className="flex-col gap-4 text-left">
               <div>
                 <label className="input-label"><Globe size={14} style={{ display: 'inline', marginRight: '6px' }}/> Website URL</label>

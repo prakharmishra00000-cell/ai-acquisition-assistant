@@ -49,42 +49,57 @@ const MatchCard = ({ name, type, matchScore, budget, techPrefs, focus }) => (
   </div>
 );
 
-const BuyerMatches = () => {
+const BuyerMatches = ({ globalData }) => {
   const navigate = useNavigate();
+  
+  const defaultBuyers = [
+    {
+      name: "Nexus Capital",
+      type: "Private Equity Firm",
+      matchScore: 96,
+      budget: "$200k - $500k",
+      techPrefs: "React, Node.js",
+      focus: ['AI SaaS', 'B2B Tools', 'High Margin']
+    },
+    {
+      name: "Sarah Jenkins (MicroPE)",
+      type: "Individual Investor",
+      matchScore: 89,
+      budget: "$100k - $300k",
+      techPrefs: "Agnostic",
+      focus: ['Solo Founder', 'Low Maintenance', 'AI Tools']
+    },
+    {
+      name: "TechAcquire Group",
+      type: "Strategic Buyer",
+      matchScore: 82,
+      budget: "$250k - $1M",
+      techPrefs: "Python, React",
+      focus: ['DevTools', 'API Products', 'SaaS']
+    }
+  ];
+
+  const buyers = globalData?.buyers || defaultBuyers;
+
   return (
     <div className="flex-col gap-8">
       <div>
         <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>AI Buyer Matches</h1>
-        <p className="text-secondary">We found 24 potential buyers based on your tech stack and valuation.</p>
+        <p className="text-secondary">We found {buyers.length} potential buyers based on your tech stack and valuation.</p>
       </div>
 
       <div className="flex-col gap-6">
-        <MatchCard 
-          name="Nexus Capital"
-          type="Private Equity Firm"
-          matchScore={96}
-          budget="$200k - $500k"
-          techPrefs="React, Node.js"
-          focus={['AI SaaS', 'B2B Tools', 'High Margin']}
-        />
-        
-        <MatchCard 
-          name="Sarah Jenkins (MicroPE)"
-          type="Individual Investor"
-          matchScore={89}
-          budget="$100k - $300k"
-          techPrefs="Agnostic"
-          focus={['Solo Founder', 'Low Maintenance', 'AI Tools']}
-        />
-        
-        <MatchCard 
-          name="TechAcquire Group"
-          type="Strategic Buyer"
-          matchScore={82}
-          budget="$250k - $1M"
-          techPrefs="Python, React"
-          focus={['DevTools', 'API Products', 'SaaS']}
-        />
+        {buyers.map((buyer, idx) => (
+          <MatchCard 
+            key={idx}
+            name={buyer.name}
+            type={buyer.type}
+            matchScore={buyer.matchScore}
+            budget={buyer.budget}
+            techPrefs={buyer.techPrefs}
+            focus={buyer.focus}
+          />
+        ))}
       </div>
     </div>
   );

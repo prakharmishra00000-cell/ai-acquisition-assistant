@@ -25,7 +25,11 @@ app.post('/api/analyze', async (req, res) => {
     const { url, targetPrice } = req.body;
     console.log(`Analyzing: ${url} with target price: ${targetPrice}`);
 
-    let techStack = ['React', 'Node.js', 'Express']; // Fallback
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({ success: false, error: 'GEMINI_API_KEY is missing from server environment.' });
+    }
+
+    let techStack = ['React', 'Node.js', 'Express']; // Default fallback if BuiltWith fails or is missing
     
     // 1. Fetch Tech Stack from BuiltWith
     if (process.env.BUILTWITH_API_KEY && process.env.BUILTWITH_API_KEY !== 'bw-key-demo') {
@@ -36,54 +40,53 @@ app.post('/api/analyze', async (req, res) => {
            techStack = bwRes.data.groups[0].categories.map(c => c.name).slice(0, 8);
         }
       } catch (bwError) {
-        console.warn('BuiltWith fetch failed, using fallback.', bwError.message);
+        console.warn('BuiltWith fetch failed, proceeding with fallback tech stack.', bwError.message);
       }
     }
 
-    // 2. Generate Valuation and Sales Pitch with Gemini
-    let aiSummary = "An impressive startup with strong technology.";
-    let exactValuation = targetPrice || "$250,000";
-    let confidenceScore = 85;
+    // 2. Generate Valuation, Pitch, and Buyers with Gemini
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const prompt = `You are an expert M&A Advisor. 
+      I am selling a website: ${url}. 
+      My target asking price is: ${targetPrice}. 
+      The tech stack detected is: ${techStack.join(', ')}.
+      
+      Generate a JSON response with exactly four fields:
+      1. "exactValuation": Calculate an EXACT, singular dollar amount (e.g. "$245,500") based on the asking price and tech stack complexity. Do not give a range.
+      2. "salesSummary": A compelling 3-sentence sales pitch highlighting the specific tech stack and why it's a great acquisition target.
+      3. "confidenceScore": A number between 70 and 99 representing the confidence of this valuation.
+      4. "buyers": An array of exactly 3 highly targeted buyer profiles. Each profile must have these fields: "name" (String), "type" (String like "Private Equity Firm", "Strategic Buyer", "Individual Investor"), "matchScore" (Number between 75 and 99), "budget" (String like "$200k - $500k"), "techPrefs" (String), and "focus" (Array of 3 Strings).
+      
+      Output ONLY valid JSON. Do not include markdown formatting or backticks around the JSON.`;
 
-    if (process.env.GEMINI_API_KEY) {
+      const result = await model.generateContent(prompt);
+      const responseText = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
+      
+      let parsedResponse;
       try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const prompt = `You are an expert M&A Advisor. 
-        I am selling a website: ${url}. 
-        My target asking price is: ${targetPrice}. 
-        The tech stack detected is: ${techStack.join(', ')}.
-        
-        Generate a JSON response with exactly three fields:
-        1. "exactValuation": Calculate an EXACT, singular dollar amount (e.g. "$245,500") based on the asking price and tech stack complexity. Do not give a range.
-        2. "salesSummary": A compelling 3-sentence sales pitch highlighting the specific tech stack and why it's a great acquisition target.
-        3. "confidenceScore": A number between 70 and 99 representing the confidence of this valuation.
-        
-        Output ONLY valid JSON.`;
-
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
-        const parsedResponse = JSON.parse(responseText);
-        
-        exactValuation = parsedResponse.exactValuation;
-        aiSummary = parsedResponse.salesSummary;
-        confidenceScore = parsedResponse.confidenceScore;
-      } catch (geminiError) {
-        console.error('Gemini fetch failed, using fallback.', geminiError.message);
+        parsedResponse = JSON.parse(responseText);
+      } catch (jsonErr) {
+        throw new Error("Gemini returned malformed JSON: " + responseText);
       }
+
+      res.json({
+        success: true,
+        data: {
+          valuation: parsedResponse.exactValuation,
+          techStack: techStack,
+          salesSummary: parsedResponse.salesSummary,
+          confidenceScore: parsedResponse.confidenceScore,
+          buyers: parsedResponse.buyers
+        }
+      });
+    } catch (geminiError) {
+      console.error('Gemini API Error:', geminiError);
+      return res.status(500).json({ success: false, error: 'Gemini API Error: ' + geminiError.message });
     }
-
-    res.json({
-      success: true,
-      data: {
-        valuation: exactValuation,
-        techStack: techStack,
-        salesSummary: aiSummary,
-        confidenceScore: confidenceScore
-      }
-    });
   } catch (error) {
     console.error('Error in analysis:', error);
-    res.status(500).json({ success: false, error: 'Failed to analyze website' });
+    res.status(500).json({ success: false, error: 'Internal Server Error: ' + error.message });
   }
 });
 

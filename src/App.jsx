@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -86,6 +86,8 @@ const TopNav = () => {
 };
 
 function App() {
+  const [globalData, setGlobalData] = useState(null);
+
   return (
     <Router>
       <div className="flex" style={{ minHeight: '100vh' }}>
@@ -95,9 +97,9 @@ function App() {
           <div className="p-6">
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/new-listing" element={<NewListing />} />
-              <Route path="/intelligence" element={<WebsiteIntelligence />} />
-              <Route path="/matches" element={<BuyerMatches />} />
+              <Route path="/new-listing" element={<NewListing setGlobalData={setGlobalData} />} />
+              <Route path="/intelligence" element={<WebsiteIntelligence globalData={globalData} />} />
+              <Route path="/matches" element={<BuyerMatches globalData={globalData} />} />
               <Route path="/messages" element={<MessagingHub />} />
             </Routes>
           </div>

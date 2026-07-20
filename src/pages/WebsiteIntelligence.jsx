@@ -1,6 +1,6 @@
 import React from 'react';
 import { Cpu, Server, Shield, Smartphone, Zap, LineChart, FileText } from 'lucide-react';
-import { useLocation, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 const IntelligenceCard = ({ title, items, icon: Icon }) => (
   <div className="glass-card flex-col gap-4">
@@ -16,12 +16,9 @@ const IntelligenceCard = ({ title, items, icon: Icon }) => (
   </div>
 );
 
-const WebsiteIntelligence = () => {
-  const location = useLocation();
-  const data = location.state?.intelligenceData;
-
+const WebsiteIntelligence = ({ globalData }) => {
   // Fallback if accessed directly
-  const displayData = data || {
+  const displayData = globalData || {
     valuation: '$240,000',
     confidenceScore: 89,
     salesSummary: "An emerging AI SaaS platform with a modern Next.js/React frontend and a robust Node.js backend. It leverages OpenAI's models for core functionality. With strong mobile responsiveness and scalable architecture, it represents a highly attractive acquisition target for private equity looking to enter the AI design space.",
