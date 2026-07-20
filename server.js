@@ -91,8 +91,12 @@ app.post('/api/analyze', async (req, res) => {
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // Catch-all route to serve index.html for React Router
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+app.use((req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api')) {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  } else {
+    next();
+  }
 });
 
 app.listen(PORT, () => {
