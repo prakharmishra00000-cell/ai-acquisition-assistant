@@ -79,7 +79,6 @@ const TopNav = () => {
         <button className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }} onClick={() => alert('Settings Panel (Account, Billing, AI Config) coming in Phase 3!')}>
           <Settings size={16} /> Settings
         </button>
-        <button className="btn btn-primary" onClick={() => alert('Upgrade Pro (Bulk Outreach, Premium AI Features) coming in Phase 3!')}>Upgrade Pro</button>
       </div>
     </header>
   );
