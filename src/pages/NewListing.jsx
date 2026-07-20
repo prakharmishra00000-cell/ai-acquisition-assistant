@@ -6,18 +6,43 @@ const NewListing = () => {
   const [step, setStep] = useState(1);
   const [url, setUrl] = useState('');
   const [price, setPrice] = useState('');
+  const [intelligenceData, setIntelligenceData] = useState(null);
   const navigate = useNavigate();
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
+    if (!url) return;
     setStep(2);
-    // Simulate AI loading
-    setTimeout(() => {
-      setStep(3);
-    }, 3000);
+    
+    try {
+      // In development, you might need the full URL depending on your proxy setup.
+      // Assuming relative paths work if served by the same express server, or we use localhost
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      
+      const response = await fetch(`${apiUrl}/api/analyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ url: url, targetPrice: price })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        setIntelligenceData(data.data);
+        setStep(3);
+      } else {
+        alert('Failed to analyze website. ' + data.error);
+        setStep(1);
+      }
+    } catch (error) {
+      console.error('API Error:', error);
+      alert('Error connecting to backend API.');
+      setStep(1);
+    }
   };
 
   const handleFinish = () => {
-    navigate('/intelligence');
+    navigate('/intelligence', { state: { intelligenceData } });
   };
 
   return (
@@ -74,9 +99,8 @@ const NewListing = () => {
             <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
             <h2 style={{ fontSize: '1.5rem' }}>AI is analyzing your website...</h2>
             <div className="text-secondary text-sm flex-col gap-2">
-              <p>Scanning frontend architecture...</p>
-              <p>Detecting AI models & database...</p>
-              <p>Estimating valuation...</p>
+              <p>Scanning frontend architecture via BuiltWith...</p>
+              <p>Generating Exact Valuation with Gemini...</p>
             </div>
             <div className="skeleton w-full" style={{ height: '4px', marginTop: '1rem' }}></div>
           </div>
@@ -88,7 +112,7 @@ const NewListing = () => {
               <CheckCircle2 size={32} color="var(--accent-green)" />
             </div>
             <h2 style={{ fontSize: '2rem' }} className="text-gradient">Analysis Complete</h2>
-            <p className="text-secondary">We've generated your tech report, valuation, and sales pitch.</p>
+            <p className="text-secondary">We've generated your exact valuation and sales pitch.</p>
             
             <button className="btn btn-primary" style={{ marginTop: '1rem' }} onClick={handleFinish}>
               View Intelligence Report <ArrowRight size={18} />
