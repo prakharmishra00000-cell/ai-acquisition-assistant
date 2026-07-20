@@ -42,7 +42,7 @@ const WebsiteIntelligence = () => {
           <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Website Intelligence</h1>
           <p className="text-secondary">Automated due diligence and valuation report.</p>
         </div>
-        <button className="btn btn-primary"><FileText size={16} /> Export Pitch Deck</button>
+        <button className="btn btn-primary" onClick={() => alert('PDF Export coming in Phase 3!')}><FileText size={16} /> Export Pitch Deck</button>
       </div>
 
       {/* Valuation Section */}

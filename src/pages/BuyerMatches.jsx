@@ -1,5 +1,6 @@
 import React from 'react';
 import { Target, History, Building, CheckCircle2, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const MatchCard = ({ name, type, matchScore, budget, techPrefs, focus }) => (
   <div className="glass-card flex-col gap-4">
@@ -42,13 +43,14 @@ const MatchCard = ({ name, type, matchScore, budget, techPrefs, focus }) => (
     </div>
 
     <div className="flex justify-end gap-3 mt-4 pt-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-      <button className="btn btn-secondary text-sm">View Profile</button>
-      <button className="btn btn-primary text-sm"><MessageSquare size={14}/> Draft Pitch</button>
+      <button className="btn btn-secondary text-sm" onClick={() => alert('Detailed Buyer Profiles coming in Phase 3!')}>View Profile</button>
+      <button className="btn btn-primary text-sm" onClick={() => navigate('/messages')}><MessageSquare size={14}/> Draft Pitch</button>
     </div>
   </div>
 );
 
 const BuyerMatches = () => {
+  const navigate = useNavigate();
   return (
     <div className="flex-col gap-8">
       <div>

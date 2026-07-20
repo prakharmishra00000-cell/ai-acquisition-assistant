@@ -76,10 +76,10 @@ const TopNav = () => {
         <p className="text-secondary text-sm">Here's what's happening with your listings today.</p>
       </div>
       <div className="flex items-center gap-4">
-        <button className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}>
+        <button className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }} onClick={() => alert('Settings Panel (Account, Billing, AI Config) coming in Phase 3!')}>
           <Settings size={16} /> Settings
         </button>
-        <button className="btn btn-primary">Upgrade Pro</button>
+        <button className="btn btn-primary" onClick={() => alert('Upgrade Pro (Bulk Outreach, Premium AI Features) coming in Phase 3!')}>Upgrade Pro</button>
       </div>
     </header>
   );
