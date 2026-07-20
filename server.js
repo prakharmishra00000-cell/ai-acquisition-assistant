@@ -114,6 +114,93 @@ app.post('/api/analyze', async (req, res) => {
   }
 });
 
+// Helper function to get valid model
+async function getValidModelName() {
+  let selectedModelName = "gemini-1.5-flash"; // Fallback
+  try {
+    const modelsRes = await axios.get(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`);
+    if (modelsRes.data && modelsRes.data.models) {
+      const validModel = modelsRes.data.models.find(m => 
+        m.supportedGenerationMethods && 
+        m.supportedGenerationMethods.includes('generateContent') && 
+        m.name.includes('gemini-1.5')
+      ) || modelsRes.data.models.find(m => 
+        m.supportedGenerationMethods && 
+        m.supportedGenerationMethods.includes('generateContent') && 
+        m.name.includes('gemini')
+      );
+      
+      if (validModel) {
+        selectedModelName = validModel.name.replace('models/', '');
+      }
+    }
+  } catch (modelFetchErr) {
+    console.warn("Failed to dynamically fetch models, using fallback.", modelFetchErr.message);
+  }
+  return selectedModelName;
+}
+
+// Live Chat API: Gemini acts as the Buyer
+app.post('/api/chat/buyer', async (req, res) => {
+  try {
+    const { buyerProfile, chatHistory, userMessage, techStack } = req.body;
+    const modelName = await getValidModelName();
+    const model = genAI.getGenerativeModel({ model: modelName });
+    
+    // Format history for the prompt
+    let historyStr = chatHistory.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
+    
+    const prompt = `You are roleplaying as an Indian investor/buyer.
+    Your Profile: Name: ${buyerProfile.name}, Type: ${buyerProfile.type}, Budget: ${buyerProfile.budget}, Focus: ${buyerProfile.focus.join(', ')}
+    The seller is pitching a project with this tech stack: ${techStack.join(', ')}
+    
+    Here is the conversation history so far:
+    ${historyStr}
+    Seller: ${userMessage}
+    
+    Write your next reply as the buyer. Keep it brief (1-3 sentences), professional, and negotiate firmly but fairly. Respond directly without any prefix.`;
+
+    const result = await model.generateContent(prompt);
+    const replyText = result.response.text().trim();
+    
+    res.json({ success: true, reply: replyText });
+  } catch (error) {
+    console.error('Buyer Chat Error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Live AI Negotiator API: Gemini drafts a response for the Seller
+app.post('/api/chat/negotiator', async (req, res) => {
+  try {
+    const { chatHistory, rules } = req.body;
+    const modelName = await getValidModelName();
+    const model = genAI.getGenerativeModel({ model: modelName });
+    
+    let historyStr = chatHistory.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
+    
+    const prompt = `You are the AI M&A Negotiator advising the seller.
+    The seller's Negotiation Rules:
+    - Target Price: ₹${rules.targetPrice}
+    - Minimum Acceptable Price: ₹${rules.minPrice}
+    - Acceptable Terms: ${rules.terms.join(', ')}
+    
+    Here is the conversation history:
+    ${historyStr}
+    
+    Draft the perfect reply for the seller to send to the buyer. Defend their valuation, strictly adhere to their minimum price and terms, and try to close the deal. 
+    Keep it brief (1-3 sentences) and professional. Output ONLY the drafted text.`;
+
+    const result = await model.generateContent(prompt);
+    const suggestionText = result.response.text().trim();
+    
+    res.json({ success: true, suggestion: suggestionText });
+  } catch (error) {
+    console.error('Negotiator Error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Serve the Static Frontend (The Vite React App)
 app.use(express.static(path.join(__dirname, 'dist')));
 

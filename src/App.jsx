@@ -96,11 +96,11 @@ function App() {
           <TopNav />
           <div className="p-6">
             <Routes>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<Dashboard globalData={globalData} />} />
               <Route path="/new-listing" element={<NewListing setGlobalData={setGlobalData} />} />
               <Route path="/intelligence" element={<WebsiteIntelligence globalData={globalData} />} />
               <Route path="/matches" element={<BuyerMatches globalData={globalData} />} />
-              <Route path="/messages" element={<MessagingHub />} />
+              <Route path="/messages" element={<MessagingHub globalData={globalData} />} />
             </Routes>
           </div>
         </main>
