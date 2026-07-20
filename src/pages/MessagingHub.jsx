@@ -6,6 +6,7 @@ const MessagingHub = ({ globalData }) => {
   const [activeBuyerIdx, setActiveBuyerIdx] = useState(0);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isDrafting, setIsDrafting] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState('');
   
   // Default buyers if accessed directly
@@ -78,6 +79,7 @@ const MessagingHub = ({ globalData }) => {
   };
 
   const generateNegotiatorSuggestion = async (historyToAnalyze) => {
+    setIsDrafting(true);
     try {
       const res = await fetch('/api/chat/negotiator', {
         method: 'POST',
@@ -90,9 +92,14 @@ const MessagingHub = ({ globalData }) => {
       const data = await res.json();
       if (data.success) {
         setAiSuggestion(data.suggestion);
+      } else {
+        alert("Negotiator failed: " + data.error);
       }
     } catch (e) {
       console.error("Failed to generate suggestion", e);
+      alert("Failed to connect to backend for AI Negotiator.");
+    } finally {
+      setIsDrafting(false);
     }
   };
 
@@ -183,11 +190,14 @@ const MessagingHub = ({ globalData }) => {
           })}
 
           {isTyping && (
-             <div className="text-sm text-secondary text-right">Buyer is typing...</div>
+             <div className="text-sm text-secondary text-right">Sending Email...</div>
+          )}
+          {isDrafting && (
+             <div className="text-sm text-secondary text-left">AI Negotiator is drafting a response...</div>
           )}
 
           {/* AI Suggested Reply */}
-          {aiSuggestion && !isTyping && (
+          {aiSuggestion && !isTyping && !isDrafting && (
             <div className="flex gap-4 mt-4">
               <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--accent-purple)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Bot size={16} color="white" />
