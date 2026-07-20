@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -80,7 +81,7 @@ app.post('/api/analyze', async (req, res) => {
       1. "exactValuation": Calculate an EXACT, singular rupee amount (e.g. "₹2,45,50,000") based on the asking price and tech stack complexity. Do not give a range.
       2. "salesSummary": A compelling 3-sentence sales pitch highlighting the specific tech stack and why it's a great acquisition target for the Indian market.
       3. "confidenceScore": A number between 70 and 99 representing the confidence of this valuation.
-      4. "buyers": An array of exactly 3 highly targeted INDIAN buyer profiles. Each profile must have these fields: "name" (String, Indian VC/PE or Strategic Buyer), "type" (String like "Private Equity Firm", "Strategic Buyer", "Individual Investor"), "matchScore" (Number between 75 and 99), "budget" (String like "₹2Cr - ₹5Cr" or "₹50L - ₹1Cr"), "techPrefs" (String), and "focus" (Array of 3 Strings).
+      4. "buyers": An array of exactly 3 highly targeted, **REAL-WORLD Indian Venture Capital or Private Equity firms**. You must output real firms (e.g. Sequoia India/Peak XV, Nexus Venture Partners, Blume Ventures, etc). Each profile must have these fields: "name" (String, real firm name), "email" (String, guess their public contact email like pitch@firmname.com or info@firmname.in), "type" (String like "Private Equity Firm", "Strategic Buyer"), "matchScore" (Number between 75 and 99), "budget" (String like "₹2Cr - ₹5Cr"), "techPrefs" (String), and "focus" (Array of 3 Strings).
       
       Output ONLY valid JSON. Do not include markdown formatting or backticks around the JSON.`;
 
@@ -140,32 +141,35 @@ async function getValidModelName() {
   return selectedModelName;
 }
 
-// Live Chat API: Gemini acts as the Buyer
-app.post('/api/chat/buyer', async (req, res) => {
+// Live Email API: Actually sends an email to the generated buyer using the user's Gmail
+app.post('/api/chat/send-email', async (req, res) => {
   try {
-    const { buyerProfile, chatHistory, userMessage, techStack } = req.body;
-    const modelName = await getValidModelName();
-    const model = genAI.getGenerativeModel({ model: modelName });
+    const { buyerProfile, subject, message } = req.body;
     
-    // Format history for the prompt
-    let historyStr = chatHistory.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
-    
-    const prompt = `You are roleplaying as an Indian investor/buyer.
-    Your Profile: Name: ${buyerProfile.name}, Type: ${buyerProfile.type}, Budget: ${buyerProfile.budget}, Focus: ${buyerProfile.focus.join(', ')}
-    The seller is pitching a project with this tech stack: ${techStack.join(', ')}
-    
-    Here is the conversation history so far:
-    ${historyStr}
-    Seller: ${userMessage}
-    
-    Write your next reply as the buyer. Keep it brief (1-3 sentences), professional, and negotiate firmly but fairly. Respond directly without any prefix.`;
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_PASSWORD) {
+      return res.status(500).json({ success: false, error: "GMAIL_USER and GMAIL_PASSWORD environment variables are missing." });
+    }
 
-    const result = await model.generateContent(prompt);
-    const replyText = result.response.text().trim();
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASSWORD
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.GMAIL_USER,
+      to: buyerProfile.email || 'pitch@nexuscapital.com',
+      subject: subject || 'Acquisition Opportunity',
+      text: message
+    };
+
+    await transporter.sendMail(mailOptions);
     
-    res.json({ success: true, reply: replyText });
+    res.json({ success: true, reply: "Message sent! Since this is a real email, their reply will go directly to your Gmail inbox." });
   } catch (error) {
-    console.error('Buyer Chat Error:', error);
+    console.error('Email Send Error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

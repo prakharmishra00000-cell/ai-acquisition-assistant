@@ -49,27 +49,25 @@ const MessagingHub = ({ globalData }) => {
     setIsTyping(true);
 
     try {
-      // 1. Get buyer reply
-      const res = await fetch('/api/chat/buyer', {
+      // 1. Send the email via backend
+      const res = await fetch('/api/chat/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           buyerProfile: activeBuyer,
-          chatHistory: currentHistory, // send history *before* this message
-          userMessage: textToSend,
-          techStack: defaultTechStack
+          subject: `Acquisition Opportunity: ${defaultTechStack.join(', ')} Startup`,
+          message: textToSend
         })
       });
       const data = await res.json();
       
       if (data.success) {
-        const historyWithReply = [...newHistory, { sender: activeBuyer.name, text: data.reply }];
+        const historyWithReply = [...newHistory, { sender: 'System', text: `Email successfully dispatched to ${activeBuyer.email || 'the firm'}! Their reply will go straight to your Gmail inbox.` }];
         setChatHistories(prev => ({ ...prev, [activeBuyerIdx]: historyWithReply }));
-
-        // 2. Automatically generate an AI Negotiator suggestion after the buyer replies
-        generateNegotiatorSuggestion(historyWithReply);
+        
+        // Optionally suggest a follow-up via Negotiator? Not needed for email.
       } else {
-        alert("Buyer AI failed to respond: " + data.error);
+        alert("Failed to send email: " + data.error);
       }
     } catch (error) {
       console.error(error);
@@ -148,11 +146,11 @@ const MessagingHub = ({ globalData }) => {
             <h2 className="font-semibold">{activeBuyer.name}</h2>
             <div className="text-xs text-secondary flex items-center gap-2">
               <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-green)' }}></span>
-              Active on platform
+              {activeBuyer.email || 'Public Email Target'}
             </div>
           </div>
           <button className="btn btn-secondary text-sm" onClick={() => setShowSettings(!showSettings)}>
-            <Settings2 size={16} /> AI Negotiator Rules
+            <Settings2 size={16} /> Pitch Settings
           </button>
         </div>
 
