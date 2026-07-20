@@ -46,7 +46,31 @@ app.post('/api/analyze', async (req, res) => {
 
     // 2. Generate Valuation, Pitch, and Buyers with Gemini
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      // Dynamically fetch available models to prevent 404 errors on specific API keys
+      let selectedModelName = "gemini-1.5-flash"; // Fallback
+      try {
+        const modelsRes = await axios.get(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`);
+        if (modelsRes.data && modelsRes.data.models) {
+          const validModel = modelsRes.data.models.find(m => 
+            m.supportedGenerationMethods && 
+            m.supportedGenerationMethods.includes('generateContent') && 
+            m.name.includes('gemini-1.5')
+          ) || modelsRes.data.models.find(m => 
+            m.supportedGenerationMethods && 
+            m.supportedGenerationMethods.includes('generateContent') && 
+            m.name.includes('gemini')
+          );
+          
+          if (validModel) {
+            selectedModelName = validModel.name.replace('models/', '');
+            console.log("Dynamically selected model:", selectedModelName);
+          }
+        }
+      } catch (modelFetchErr) {
+        console.warn("Failed to dynamically fetch models, using fallback.", modelFetchErr.message);
+      }
+
+      const model = genAI.getGenerativeModel({ model: selectedModelName });
       const prompt = `You are an expert M&A Advisor. 
       I am selling a website: ${url}. 
       My target asking price is: ${targetPrice}. 
