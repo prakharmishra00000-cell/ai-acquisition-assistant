@@ -46,7 +46,7 @@ app.post('/api/analyze', async (req, res) => {
 
     // 2. Generate Valuation, Pitch, and Buyers with Gemini
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
       const prompt = `You are an expert M&A Advisor. 
       I am selling a website: ${url}. 
       My target asking price is: ${targetPrice}. 
