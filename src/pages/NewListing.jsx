@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wand2, Globe, DollarSign, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Wand2, Globe, IndianRupee, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const NewListing = ({ setGlobalData }) => {
@@ -82,11 +82,11 @@ const NewListing = ({ setGlobalData }) => {
                 />
               </div>
               <div>
-                <label className="input-label"><DollarSign size={14} style={{ display: 'inline', marginRight: '6px' }}/> Target Asking Price ($)</label>
+                <label className="input-label"><IndianRupee size={14} style={{ display: 'inline', marginRight: '6px' }}/> Target Asking Price (₹)</label>
                 <input 
                   type="text" 
                   className="input-field" 
-                  placeholder="e.g. 250,000" 
+                  placeholder="e.g. 2,50,00,000" 
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                 />

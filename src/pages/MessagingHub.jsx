@@ -61,7 +61,7 @@ const MessagingHub = () => {
             <div className="flex-col gap-1 w-full max-w-[80%]">
               <span className="text-xs text-secondary">You (Drafted by AI)</span>
               <div className="p-4 rounded-xl rounded-tl-none" style={{ background: 'rgba(0, 240, 255, 0.1)', border: '1px solid rgba(0, 240, 255, 0.2)' }}>
-                Hi Nexus Capital, I saw you have a mandate for AI SaaS. My project is generating $5k MRR with a fully automated Next.js/OpenAI stack. Are you open to a brief chat?
+                Hi Nexus India Capital, I saw you have a mandate for AI SaaS. My project is generating ₹4L MRR with a fully automated Next.js/OpenAI stack. Are you open to a brief chat?
               </div>
             </div>
           </div>
@@ -84,7 +84,7 @@ const MessagingHub = () => {
             <div className="flex-col gap-2 w-full max-w-[80%]">
               <span className="text-xs font-medium" style={{ color: 'var(--accent-purple)' }}>AI Suggested Response (Based on your limits)</span>
               <div className="p-4 rounded-xl rounded-tl-none relative" style={{ background: 'rgba(169, 0, 255, 0.1)', border: '1px solid rgba(169, 0, 255, 0.3)' }}>
-                I'm aiming for $250k based on standard multiples, but for a fast, all-cash close with no earn-outs, I'd be willing to discuss $220k.
+                I'm aiming for ₹2.5Cr based on standard multiples, but for a fast, all-cash close with no earn-outs, I'd be willing to discuss ₹2.2Cr.
                 
                 <div className="flex gap-2 mt-4 pt-4 border-t border-[rgba(255,255,255,0.1)]">
                   <button className="btn btn-primary text-xs py-1 px-3">Send this</button>
@@ -117,12 +117,12 @@ const MessagingHub = () => {
           
           <div className="flex-col gap-4">
             <div>
-              <label className="input-label text-xs">Target Price ($)</label>
-              <input type="text" className="input-field text-sm" defaultValue="250,000" />
+              <label className="input-label text-xs">Target Price (₹)</label>
+              <input type="text" className="input-field text-sm" defaultValue="2,50,00,000" />
             </div>
             <div>
-              <label className="input-label text-xs">Minimum Acceptable Price ($)</label>
-              <input type="text" className="input-field text-sm" defaultValue="200,000" />
+              <label className="input-label text-xs">Minimum Acceptable Price (₹)</label>
+              <input type="text" className="input-field text-sm" defaultValue="2,00,00,000" />
             </div>
             
             <div className="mt-2">

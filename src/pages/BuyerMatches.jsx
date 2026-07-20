@@ -54,26 +54,26 @@ const BuyerMatches = ({ globalData }) => {
   
   const defaultBuyers = [
     {
-      name: "Nexus Capital",
+      name: "Nexus India Capital",
       type: "Private Equity Firm",
       matchScore: 96,
-      budget: "$200k - $500k",
+      budget: "₹2Cr - ₹5Cr",
       techPrefs: "React, Node.js",
       focus: ['AI SaaS', 'B2B Tools', 'High Margin']
     },
     {
-      name: "Sarah Jenkins (MicroPE)",
+      name: "Rohan Sharma (MicroPE)",
       type: "Individual Investor",
       matchScore: 89,
-      budget: "$100k - $300k",
+      budget: "₹50L - ₹1.5Cr",
       techPrefs: "Agnostic",
       focus: ['Solo Founder', 'Low Maintenance', 'AI Tools']
     },
     {
-      name: "TechAcquire Group",
+      name: "TechAcquire India",
       type: "Strategic Buyer",
       matchScore: 82,
-      budget: "$250k - $1M",
+      budget: "₹3Cr - ₹10Cr",
       techPrefs: "Python, React",
       focus: ['DevTools', 'API Products', 'SaaS']
     }

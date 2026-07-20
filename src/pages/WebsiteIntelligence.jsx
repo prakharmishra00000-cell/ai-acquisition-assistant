@@ -19,9 +19,9 @@ const IntelligenceCard = ({ title, items, icon: Icon }) => (
 const WebsiteIntelligence = ({ globalData }) => {
   // Fallback if accessed directly
   const displayData = globalData || {
-    valuation: '$240,000',
+    valuation: '₹2,40,00,000',
     confidenceScore: 89,
-    salesSummary: "An emerging AI SaaS platform with a modern Next.js/React frontend and a robust Node.js backend. It leverages OpenAI's models for core functionality. With strong mobile responsiveness and scalable architecture, it represents a highly attractive acquisition target for private equity looking to enter the AI design space.",
+    salesSummary: "An emerging AI SaaS platform with a modern Next.js/React frontend and a robust Node.js backend. It leverages OpenAI's models for core functionality. With strong mobile responsiveness and scalable architecture, it represents a highly attractive acquisition target for Indian private equity looking to enter the AI design space.",
     techStack: ['React', 'Next.js', 'Node.js', 'Express', 'PostgreSQL', 'Redis', 'Tailwind CSS']
   };
 

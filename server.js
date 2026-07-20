@@ -71,16 +71,16 @@ app.post('/api/analyze', async (req, res) => {
       }
 
       const model = genAI.getGenerativeModel({ model: selectedModelName });
-      const prompt = `You are an expert M&A Advisor. 
+      const prompt = `You are an expert M&A Advisor based in India. 
       I am selling a website: ${url}. 
-      My target asking price is: ${targetPrice}. 
+      My target asking price is: ₹${targetPrice} (Indian Rupees). 
       The tech stack detected is: ${techStack.join(', ')}.
       
       Generate a JSON response with exactly four fields:
-      1. "exactValuation": Calculate an EXACT, singular dollar amount (e.g. "$245,500") based on the asking price and tech stack complexity. Do not give a range.
-      2. "salesSummary": A compelling 3-sentence sales pitch highlighting the specific tech stack and why it's a great acquisition target.
+      1. "exactValuation": Calculate an EXACT, singular rupee amount (e.g. "₹2,45,50,000") based on the asking price and tech stack complexity. Do not give a range.
+      2. "salesSummary": A compelling 3-sentence sales pitch highlighting the specific tech stack and why it's a great acquisition target for the Indian market.
       3. "confidenceScore": A number between 70 and 99 representing the confidence of this valuation.
-      4. "buyers": An array of exactly 3 highly targeted buyer profiles. Each profile must have these fields: "name" (String), "type" (String like "Private Equity Firm", "Strategic Buyer", "Individual Investor"), "matchScore" (Number between 75 and 99), "budget" (String like "$200k - $500k"), "techPrefs" (String), and "focus" (Array of 3 Strings).
+      4. "buyers": An array of exactly 3 highly targeted INDIAN buyer profiles. Each profile must have these fields: "name" (String, Indian VC/PE or Strategic Buyer), "type" (String like "Private Equity Firm", "Strategic Buyer", "Individual Investor"), "matchScore" (Number between 75 and 99), "budget" (String like "₹2Cr - ₹5Cr" or "₹50L - ₹1Cr"), "techPrefs" (String), and "focus" (Array of 3 Strings).
       
       Output ONLY valid JSON. Do not include markdown formatting or backticks around the JSON.`;
 
